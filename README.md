@@ -1,7 +1,30 @@
-# F-4E-Better-Bombing-Calculator
+# F-4E Better Bombing Calculator
 A comprehensive overhaul of the default in-game Bombing Calculator overlay for the Heatblur F-4E Phantom II in DCS.
 
-![main_page](Images/main_page.jpg)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/main_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/main_page.jpg" width="200px;">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/radar_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/radar_page.jpg" width="200px;">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/perf_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/perf_page.jpg" width="200px;">
+      </a>
+    </td>
+	<td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/saved_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/saved_page.jpg" width="200px;">
+      </a>
+    </td>
+  </tr>
+</table>
 
 # Features
 ## Revised Bombing Logic:
