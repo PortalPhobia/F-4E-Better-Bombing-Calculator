@@ -1,0 +1,473 @@
+<!--
+  ~ Copyright 2023 Heatblur Simulations. All rights reserved.
+  ~
+  -->
+<!doctype html>
+<html lang="en" class="light">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Bombing Table UI</title>
+        <link rel="stylesheet" type="text/css" href="css/select2.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    </head>
+    <body>
+        <div class="page-content">
+            <h1 class="page-title">Bombing Table</h1>
+            <div class="close-button-container">
+                <button id="closeWindow">&times;</button>
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        <div class="label-with-dots"><label for="delivery_mode">Mode of delivery</label></div>
+                    </td>
+                    <td>
+                        <select name="delivery_mode" id="delivery_mode">
+                            <option value="none" disabled hidden>Mode</option>
+                            <option value="Direct" selected>Direct</option>
+                            <option value="DT">DT</option>
+                            <option value="TGT-Find">TGT Find</option>
+                            <option value="DL">DL</option>
+                            <option value="L">L</option>
+                            <option value="Offset">Offset</option>
+                            <option value="Loft">Loft</option>
+                            <option value="O-S">O/S</option>
+                            <option value="O-S-INST">O/S INST</option>
+                            <option value="WRCS-AGM-45">WRCS AGM-45</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <div class="label-with-dots"><label for="bomb_type">Type of bomb</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <select id="bomb_type">
+                                <option value="none" disabled hidden>Type</option>
+                                <option value="MK-81">MK-81</option>
+                                <option value="MK-82" selected>MK-82</option>
+                                <option value="MK-83">MK-83</option>
+                                <option value="MK-84">MK-84</option>
+                                <option value="MK-82AIR">MK-82AIR</option>
+                                <option value="MK-82AIR-LD">MK-82AIR LD</option>
+                                <option value="MK-82SNAKEYE">MK-82SNK</option>
+                                <option value="MK-82SNAKEYE-LD">MK-82SNK LD</option>
+                                <option value="M117">M117</option>
+                                <option value="CBU-87">CBU-87</option>
+                                <option value="ROCKEYE">MK-20</option>
+                                <option value="GBU-10">GBU-10</option>
+                                <option value="GBU-12">GBU-12</option>
+                                <option value="GBU-24">GBU-24</option>
+                                <option value="BDU-33">BDU-33</option>
+                                <option value="BDU-50LD">BDU-50LD</option>
+                                <option value="BDU-50HD">BDU-50HD</option>
+                            </select>
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <div class="label-with-dots"><label for="run_in_speed">Run-in Speed</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <input type="number" id="run_in_speed" min="100" max="900" step="25" value="400"/>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            knots TAS
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions DL L Offset Loft O-S O-S-INST">
+                            <div class="content label-with-dots"><label for="run_in_alt">Run-in Altitude</label></div>
+                        </section>
+                        <section class="jqueryOptions Direct DT TGT-Find">
+                            <div class="content label-with-dots"><label for="run_in_alt">Release Altitude</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <input
+                                class="content"
+                                type="number"
+                                id="run_in_alt"
+                                min="0"
+                                max="40000"
+                                step="250"
+                                value="3000" />
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DL L Offset Loft O-S O-S-INST">feet MSL</section>
+                        <section class="jqueryOptions DT TGT-Find">feet MSL</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions DL L Offset Loft O-S O-S-INST">
+                            <div class="label-with-dots">
+                                <label for="ip_target_dist">Distance IP ↔ Target</label>
+                            </div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DL L Offset Loft O-S O-S-INST">
+                            <input type="number" id="ip_target_dist" min="0" max="500000" step="0.1" value="0" />
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DL L Offset Loft O-S O-S-INST">
+                            <label for="dist_unit" class="hidden" hidden>Distance Unit</label>
+                            <select id="dist_unit">
+                                <option value="nm">nm</option>
+                                <option value="feet">feet</option>
+                            </select>
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            <div class="label-with-dots"><label for="bearing">Bearing</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            <input type="number" id="bearing" min="0" max="359" step="1" value="0" />
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Offset">deg</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="label-with-dots"><label for="target_alt">Target Altitude</label></div>
+                    </td>
+                    <td><input type="number" id="target_alt" min="0" max="40000" step="50" value="0" /></td>
+                    <td>feet MSL</td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Direct L DL">
+                        <div class="label-with-dots"><label for="total_weight">Total Aircraft Weight</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct L DL">
+                        <input type="number" id="total_weight" min="32500" max="61200" step="100" value="45142" /> <!-- Value is the weight of an aircraft with 100% fuel and cannon ammo without any ordinance-->
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct L DL">
+                        lbs <input type="button" id="update_weight" value="⟳" />
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="labs">
+                        <section class="jqueryOptions Loft O-S O-S-INST">
+                            <div class="label-with-dots"><label for="loft_angle">Loft Angle</label></div>
+                        </section>
+                        <section class="jqueryOptions DT Direct">
+                            <div class="label-with-dots"><label for="dive_angle">Dive Angle</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">
+                            <input type="number" id="loft_angle" min="0" max="180" step="2" value="0" />
+                        </section>
+                        <section class="jqueryOptions DT Direct">
+                            <input type="number" id="dive_angle" min="0" max="180" step="2" value="0" />
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DT Direct Loft O-S O-S-INST">deg</section>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <section class="button-group">
+                            <input
+                                type="reset"
+                                id="erase_button"
+                                value="Clear"
+                                onclick="
+                document.getElementById('run_in_alt').value = '2000'
+                document.getElementById('run_in_speed').value = '350'
+                document.getElementById('ip_target_dist').value = '0'
+                document.getElementById('target_alt').value = '0'
+                document.getElementById('loft_angle').value = '0'
+                document.getElementById('bearing').value= '0' " />
+                            <input type="button" id="save_last_button" value="Save" />
+                        </section>
+                        <section class="jqueryOptions DT DL L Offset Loft O-S O-S-INST TGT-Find WRCS-AGM-45 button-group">
+                            <input type="button" id="transfer_to_jester" value="Tell Jester" />
+                        </section>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions DT DL L Offset Loft O-S O-S-INST TGT-Find WRCS-AGM-45 button-group">
+                            <input type="button" id="transfer_to_jester_and_close" value="Tell Jester and Close" />
+                        </section>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr class="output_begin">
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">
+                            <div class="label-with-dots"><label>Pull-Up Timer</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">
+                            <output
+                                class="output-container"
+                                id="pull_up_timer"
+                                for="run_in_alt run_in_speed ip_target_dist loft_angle"
+                                >0</output
+                            >
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">sec</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">
+                            <div class="label-with-dots"><label>Pull-Up Range</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">
+                            <output
+                                class="output-container"
+                                id="pullup_range"
+                                for="run_in_alt run_in_speed ip_target_dist loft_angle"
+                                >0</output
+                            >
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Loft O-S O-S-INST">feet</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions DL L Loft Offset O-S O-S-INST">
+                            <div class="label-with-dots"><label>Release Range</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DL L Loft Offset O-S O-S-INST">
+                            <output
+                                class="output-container"
+                                id="release_range"
+                                for="run_in_alt run_in_speed target_alt ip_target_dist"
+                                >0</output
+                            >
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DL L Loft Offset O-S O-S-INST">feet</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            <div class="label-with-dots"><label>N/S WRCS</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            <output class="output-container" id="north_south" for="bearing ip_target_dist">0</output>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            feet
+                            <output id="northing_southing" for="bearing ip_target_dist">N</output>
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            <div class="label-with-dots"><label>E/W WRCS</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            <output class="output-container" id="east_west" for="bearing ip_target_dist">0</output>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Offset">
+                            feet
+                            <output id="easting_westing" for="bearing ip_target_dist">E</output>
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Direct DL L">
+                            <div class="label-with-dots"><label>Sight depression</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DL L">
+                            <output
+                                class="output-container"
+                                id="sight_depression_laydown"
+                                for="run_in_alt ip_target_dist"
+                                >0</output
+                            >
+                        </section>
+                        <section class="jqueryOptions Direct">
+                            <output
+                                class="output-container"
+                                id="sight_depression_direct"
+                                for="run_in_alt ip_target_dist"
+                                >0</output
+                            >
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DL L">mils</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions DT TGT-Find">
+                            <div class="label-with-dots"><label>Drag Coefficient</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions DT TGT-Find">
+                            <output class="output-container" id="drag_coefficient" for="run_in_alt ip_target_dist"
+                                >0</output
+                            >
+                        </section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Direct DT TGT-Find">
+                            <div class="label-with-dots"><label>Bomb range</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT TGT-Find">
+                            <output class="output-container" id="bomb_range">0</output>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT TGT-Find">feet</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <div class="label-with-dots"><label>Time of Flight</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                            <output class="output-container" id="time_of_flight">0</output>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">s</section>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="jqueryOptions TGT-Find">
+                            <div class="label-with-dots"><label>ROR Slant Range</label></div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions TGT-Find">
+                            <output class="output-container" id="ror_slant_range">0</output>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="jqueryOptions TGT-Find">ft</section>
+                    </td>
+                </tr>
+            </table>
+
+            <h1>Pattern</h1>
+
+            <table>
+                <tr>
+                    <td>
+                        <div class="label-with-dots"><label for="release_interval">Release Interval</label></div>
+                    </td>
+                    <td><input type="number" id="release_interval" min="0.05" max="1.0" step="0.01" value="0.05" /></td>
+                    <td>sec</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="label-with-dots"><label for="interval_multiplier">Interval Multiplier</label></div>
+                    </td>
+                    <td>
+                        <select id="interval_multiplier">
+                            <option value="norm">Norm</option>
+                            <option value="x10">x10</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="label-with-dots"><label for="bomb_nr_on_target">Bomb on Target</label></div>
+                    </td>
+                    <td><input type="number" id="bomb_nr_on_target" min="1" max="24" step="1" value="1" /></td>
+                    <td>Nr.</td>
+                </tr>
+                <tr class="output_begin">
+                    <td>
+                        <div class="label-with-dots"><label>Release Advance</label></div>
+                    </td>
+                    <td>
+                        <output
+                            class="output-container"
+                            id="release_advance"
+                            for="release_interval interval_multiplier bomb_nr_on_target"
+                            >0</output
+                        >
+                    </td>
+                    <td>ms</td>
+                </tr>
+                <tr>
+                    <td>
+                        <section class="button-group">
+                            <input type="button" id="transfer_pattern_to_jester" value="Tell Jester" />
+                        </section>
+                    </td>
+                </tr>
+            </table>
+            <h1>Saved Solutions</h1>
+            <ol type="1" id="bombing_solutions_list"></ol>
+        </div>
+        <script src="js/jquery-3.7.1.min.js"></script>
+        <script src="js/select2.min.js"></script>
+        <script src="js/interface.js"></script>
+        <script type="module" src="js/main.js"></script>
+    </body>
+</html>
