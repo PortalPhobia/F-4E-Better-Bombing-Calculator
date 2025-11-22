@@ -258,7 +258,7 @@ select,
 .select2-container--default .select2-results__option--selected {
     background-color: var(--foreground-color);
     color: var(--background-color);
-    opacity: 0.5;
+    /* opacity: 0.5; Removed opacity for active state to 'swap' */
 }
 
 .select2-results__options {
@@ -268,6 +268,7 @@ select,
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
     background-color: var(--foreground-color);
     color: var(--background-color);
+    opacity: 0.5; /* Added opacity here to swap */
 }
 
 .select2-container .select2-selection--single .select2-selection__rendered {
@@ -290,4 +291,184 @@ input::-webkit-inner-spin-button {
 .select2-results__options::-webkit-scrollbar-thumb {
     border-radius: 0;
     background-color: var(--foreground-color);
+}
+
+.coord-input {
+    width: 400px !important;
+    font-size: 1.5vh !important;
+}
+
+/* Utility class to hide elements dynamically via JS logic */
+.force-hide {
+    display: none !important;
+}
+
+/* Specific style for the long coordinate inputs */
+.coord-input {
+    width: 200px !important; /* Match standard input width to prevent cutoff */
+    font-size: 1.5vh !important; /* Slightly smaller font to fit long coords */
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/* Flex container for inputs with buttons */
+.flex-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Styles for the "X" clear button */
+.clear-btn:hover {
+    background-color: #6d6d6d;
+    color: white;
+}
+
+/* --- TAB NAVIGATION STYLES --- */
+.tab-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #3e3e3e;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.tab-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--foreground-color);
+    opacity: 0.3;
+    font-size: 2vh;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 16px;
+    transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn:hover {
+    color: var(--foreground-color);
+    opacity: 0.6;
+}
+
+.tab-btn.active {
+    color: var(--foreground-color);
+    opacity: 1.0;
+    border-bottom: 3px solid #5897fb;
+}
+
+/* Ensure content is hidden by default if not active (handled by JS, but good practice) */
+.tab-content {
+    width: 100%;
+}
+
+.collapsible-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.collapsible-header:after {
+    content: '▶';
+    font-size: 0.6em;
+    margin-left: 10px;
+}
+
+.collapsible-header.collapsed:after {
+    content: '▼';
+    font-size: 0.6em;
+    margin-left: 10px;
+}
+
+.saved-section {
+    margin-bottom: 25px;
+}
+
+.file-tab-header {
+    display: inline-block;
+    padding: 6px 16px;
+    font-weight: bold;
+    border: 2px solid var(--foreground-color);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    margin-left: 10px;
+    background-color: var(--background-color);
+    position: relative;
+    top: 2px; /* Pull down to overlap border */
+    z-index: 2; /* Sit on top of the content border */
+}
+
+.file-folder-content {
+    border-top: 2px solid var(--foreground-color);
+    padding: 10px 2px 0 2px;
+    position: relative;
+    z-index: 1;
+}
+
+.saved-list {
+    margin: 0;
+    padding-left: 22px;
+}
+
+.saved-list li {
+    margin-bottom: 10px;
+}
+
+.saved-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.saved-info {
+    flex-grow: 1;
+}
+
+.saved-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    align-items: flex-start; /* Align with top line of text */
+}
+
+.load-btn, .delete-btn {
+    border: 1px solid var(--foreground-color);
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.8em;
+    padding: 0px 4px;
+    transition: all 0.2s;
+    line-height: 1.4;
+    margin-top: 2px;
+}
+
+.load-btn:hover {
+    background-color: #5897fb;
+    color: white;
+    border-color: #5897fb;
+}
+
+.delete-btn:hover {
+    background-color: #ff4d4d;
+    color: white;
+    border-color: #ff4d4d;
+}
+
+.app-title {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    font-size: 1.1em; 
+    line-height: 1.1;
+    color: var(--foreground-color);
+    opacity: 0.9;
+    pointer-events: none; /* Allows clicking through if needed */
+    z-index: 10;
+    text-align: left;
+    font-weight: normal;
 }
