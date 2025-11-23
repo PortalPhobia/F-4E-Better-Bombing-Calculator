@@ -899,6 +899,13 @@ $(document).ready(function () {
         $('#' + targetId).val('').trigger('input');
     });
 
+    // Close on 'B' key press
+    $(document).on('keydown', function(event) {
+        if ((event.key === 'b' || event.key === 'B') && !$(event.target).is('input, select, textarea')) {
+            closeWindow();
+        }
+    });
+
     $('#delivery_mode, #offset_method').change(updateUI);
     updateUI();
 
