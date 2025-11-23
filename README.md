@@ -80,3 +80,7 @@ Constructive criticism and suggestions for new features are always welcome! I ho
 Modified from the original Bombing Calculator code by Heatblur \
 Thank you to JonathanTurnock for his DCS World Projections list:
 - https://github.com/JonathanTurnock/dcs-projections
+
+# Changelog
+## v1.0B [2025/11/23]
+- Added the ability to press "B" to close the overlay without having to click off the overlay, as long as an input field is not selected
