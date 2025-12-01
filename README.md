@@ -1,4 +1,4 @@
-# F-4E Better Bombing Calculator
+# F-4E Better Bombing Calculator \[v1.1a]
 A comprehensive overhaul of the default in-game Bombing Calculator overlay for the Heatblur F-4E Phantom II in DCS.
 
 <table>
