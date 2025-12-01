@@ -1,9 +1,384 @@
 const FACTOR_NM_TO_FEET = 6076;
-const FACTOR_M_TO_FEET = 3.28084;
 const FACTOR_DEGREE_TO_NATO_MILS = 17.777778;
 const MAXIMUM_MILS_SUPPORTED_BY_F4 = 245;
 const WEIGHT_CORRECTION_THRESHOLD = 34200; 	//Weight correction has to be applied beyond this threshold as stated in 3rd_TFS_Conventional_Weapons_Planning_Guide
 
+
+// Modified from original
+window.SetWeight = function SetWeight(updated_weight_lbs) { 
+    const val = updated_weight_lbs.toFixed(0);
+    $('#total_weight').val(val); 
+    $('#perf_gross_weight').val(val);
+    computePerf(); 
+    computeSightDepression();
+}
+
+window.UpdateWeight = function UpdateWeight() {
+    hb_send_proxy('UPDATE_WEIGHT');
+}
+
+window.SetLabsResult = function SetLabsResult(pull_up_timer_s) {
+    $('#pull_up_timer').text(pull_up_timer_s);
+}
+
+window.SetLabsRange = function SetLabsRange(pullup_range_ft) {
+    $('#pullup_range').text(pullup_range_ft);
+}
+
+window.SetCcrpResult = function SetCcrpResult(release_range_ft) {
+    $('#release_range').text(release_range_ft);
+}
+
+window.SetDtResult = function SetDtResult(drag_coefficient) {
+    $('#drag_coefficient').text(drag_coefficient);
+}
+
+window.SetTof = function SetTof(tof) {
+    let formattedTof = parseFloat(tof).toFixed(2);
+    if(isNaN(tof) || tof < 0) {
+        formattedTof = '⚠️';
+    }
+
+    $('#time_of_flight').text(formattedTof);
+}
+
+window.SetBombRange = function SetBombRange(bombing_range) {
+    $('#bomb_range').text(bombing_range);
+}
+
+window.SetOffsetResult = function SetOffsetResult(north_south_offset, east_west_offset) {
+    if (north_south_offset < 0) {
+        $('#northing_southing').text('S');
+        $('#north_south').text(-north_south_offset);
+    } else {
+        $('#northing_southing').text('N');
+        $('#north_south').text(north_south_offset);
+    }
+    if (east_west_offset < 0) {
+        $('#easting_westing').text('W');
+        $('#east_west').text(-east_west_offset);
+    } else {
+        $('#easting_westing').text('E');
+        $('#east_west').text(east_west_offset);
+    }
+}
+
+window.SetDirectResult = function SetDirectResult(sight_depression_direct) {
+    const additional_weight_mils = ComputeWeightMilCorrection();
+    const sight_depression_nato_mils = parseFloat(sight_depression_direct) * -FACTOR_DEGREE_TO_NATO_MILS + additional_weight_mils; //Negative because the degree we get from cpp is negative so we flip flop it around here
+    let sight_depression_text = sight_depression_nato_mils.toFixed(0);
+
+    if (sight_depression_nato_mils < 0
+        || sight_depression_nato_mils > MAXIMUM_MILS_SUPPORTED_BY_F4
+        || isNaN(sight_depression_nato_mils)
+    ) {
+        sight_depression_text = '⚠️';
+        $('#sight_depression_direct').text(sight_depression_text);
+    } else {
+        $('#sight_depression_direct').text(sight_depression_text);
+    }
+};
+
+window.ComputeWeightMilCorrection = function ComputeWeightMilCorrection() {
+	 //weight correction is +.7 per every 1k weight above 34.2 klbs
+    const aircraft_weight = $('#total_weight').val();
+    let additional_weight_mils = (aircraft_weight - WEIGHT_CORRECTION_THRESHOLD) / 1000 * 0.7;
+
+
+    if(isNaN(additional_weight_mils)) {
+        return 0;
+    }
+    return additional_weight_mils;
+}
+
+// Modified from original
+function computeMode() {
+    const selectedMode = $('#delivery_mode').val();
+    const bomb_type = $('#bomb_type').val();
+    const run_in_altitude_ft = $('#run_in_alt').val();
+    const ip_target_distance_ft = getIpTargetDistance();
+    const run_in_speed_kt = $('#run_in_speed').val();
+    const target_altitude_ft = $('#target_alt').val();
+    const release_angle_deg = $('#release_angle').val();
+    const inverted_release_angle_deg = (-release_angle_deg).toString();
+
+    // Requires DCS specific code, logic is moved to C++ and results come back via SetXXXResult methods
+    if (selectedMode === 'Direct') {
+        hb_send_proxy('DIRECT',
+            bomb_type,
+            run_in_altitude_ft,
+            run_in_speed_kt,
+            ip_target_distance_ft,
+            target_altitude_ft,
+            inverted_release_angle_deg);
+    } else if (selectedMode === 'DL' || selectedMode === 'L' || selectedMode === 'Offset') {
+        hb_send_proxy('CCRP',
+            bomb_type,
+            run_in_altitude_ft,
+            run_in_speed_kt,
+            ip_target_distance_ft,
+            target_altitude_ft,
+            release_angle_deg);
+    } else if (selectedMode === 'Loft' || selectedMode === 'O-S' || selectedMode === 'O-S-INST') {
+        hb_send_proxy('LABS',
+            bomb_type,
+            run_in_altitude_ft,
+            run_in_speed_kt,
+            ip_target_distance_ft,
+            target_altitude_ft,
+            release_angle_deg);
+    } else if (selectedMode === 'DT' || selectedMode === 'TGT-Find') {
+        hb_send_proxy('DT',
+            bomb_type,
+            run_in_altitude_ft,
+            run_in_speed_kt,
+            ip_target_distance_ft,
+            target_altitude_ft,
+            inverted_release_angle_deg);
+    }
+}
+
+function transferTableToJester() {
+    const delivery_mode = $('#delivery_mode').val();
+    const target_alt = $('#target_alt').val();
+    const dist_ip_tgt_ft = getIpTargetDistance();
+    const release_range = $('#release_range').val();
+    let drag_coefficient = $('#drag_coefficient').val();
+    let pullup_timer = $('#pull_up_timer').val();
+    const release_angle = $('#release_angle').val();
+    let north_south_offset = $('#north_south').val();
+    let east_west_offset = $('#east_west').val();
+    const northing_southing = $('#northing_southing').val();
+    const easting_westing = $('#easting_westing').val();
+
+    if (northing_southing === 'S') {
+        north_south_offset = '-' + north_south_offset;
+    }
+    if (easting_westing === 'W') {
+        east_west_offset = '-' + east_west_offset;
+    }
+
+    if (drag_coefficient === '⚠️') {
+        drag_coefficient = '9.99';
+    } else if (pullup_timer === '⚠️') {
+        pullup_timer = '0.00';
+    }
+
+    if (delivery_mode == 'L' || delivery_mode == 'DL') {
+        hb_send_proxy('JESTER_TABLE',
+            delivery_mode,
+            drag_coefficient,
+            release_range,
+            dist_ip_tgt_ft,
+            pullup_timer,
+            release_angle);
+    } else if (delivery_mode === 'Offset') {
+        hb_send_proxy('JESTER_TABLE',
+            delivery_mode,
+            drag_coefficient,
+            release_range,
+            target_alt,
+            north_south_offset,
+            east_west_offset);
+    } else if (delivery_mode === 'WRCS-AGM-45') {
+        hb_send_proxy('WRCS_AGM', target_alt);
+    } else {
+        hb_send_proxy('JESTER_TABLE',
+            delivery_mode,
+            drag_coefficient,
+            release_range,
+            target_alt,
+            pullup_timer,
+            release_angle);
+    }
+}
+
+function closeWindow() {
+    hb_send_proxy('close'); 
+}
+
+function closeAndTellJester() {
+    transferTableToJester();
+    closeWindow();
+}
+
+function getIpTargetDistance() {
+    const target_dist_unit = $('#dist_unit option:selected').val();
+    let ip_target_distance_ft = $('#ip_target_dist').val();
+
+    if (target_dist_unit === 'nm') {
+        ip_target_distance_ft *= FACTOR_NM_TO_FEET;
+        ip_target_distance_ft = Math.trunc(ip_target_distance_ft);
+        return ip_target_distance_ft;
+    } else {
+        return ip_target_distance_ft;
+    }
+}
+
+function computeSightDepression() {
+    // arctan(height/range) converted to nato mils = sight depression
+    // + weight correction
+    const target_range = getIpTargetDistance();
+    const run_in_height = $('#run_in_alt').val();
+    const tgt_alt = $('#target_alt').val();
+    const additional_weight_mils = ComputeWeightMilCorrection();
+
+    let height = run_in_height - tgt_alt;
+    const sight_depression_mils = ((Math.atan(height / target_range) * 180) / Math.PI) * FACTOR_DEGREE_TO_NATO_MILS + additional_weight_mils;
+    let sight_depression_text = sight_depression_mils.toFixed(0);
+
+    if (sight_depression_mils > MAXIMUM_MILS_SUPPORTED_BY_F4 || isNaN(sight_depression_mils)) {
+        sight_depression_text = '⚠️';
+    }
+    $('#sight_depression_laydown').text(sight_depression_text);
+}
+
+function computeRorSlantRange() {
+    // ROR slant range  = sqrt(release range^2 + altitude^2)
+
+    const release_range = $('#bomb_range').val();
+    const release_altitude = $('#run_in_alt').val();
+    const target_alt = $('#target_alt').val();
+
+    let height = release_altitude - target_alt;
+
+    const ror_slant_range = Math.sqrt(Math.pow(release_range, 2) + Math.pow(height, 2))
+    let ror_slant_range_text = ror_slant_range.toFixed(0);
+
+    if (isNaN(ror_slant_range)) {
+        ror_slant_range_text = '⚠️';
+    }
+    $('#ror_slant_range').text(ror_slant_range_text);
+}
+
+function unitConverter() {
+    const target_dist_unit = $('#dist_unit option:selected').val();
+
+    const dist_input_field = $('#ip_target_dist');
+    let dist = dist_input_field.val();
+
+    if (target_dist_unit === 'nm') {
+        dist /= FACTOR_NM_TO_FEET;
+        dist = dist.toFixed(2);
+        dist_input_field.attr('step', 0.10);
+    } else {
+        dist *= FACTOR_NM_TO_FEET;
+        dist = dist.toFixed(0);
+        dist_input_field.attr('step', 100);
+    }
+
+    dist_input_field.val(dist);
+}
+
+function computePattern() {
+    // interval * (bomb - 1)
+    let interval_ms = $('#release_interval').val() * 1_000;
+    const multiplier = $('#interval_multiplier option:selected').val();
+
+    if (multiplier === 'x10') {
+        interval_ms *= 10;
+    }
+
+    const bomb_number = $('#bomb_nr_on_target').val();
+
+    const release_advance_ms = interval_ms * (bomb_number - 1);
+    let release_advance_text = release_advance_ms;
+    if (release_advance_ms >= 1000) {
+        release_advance_text = '⚠️';
+    }
+    $('#release_advance').text(release_advance_text);
+}
+
+function computeOffset() {
+    const bearing = $('#bearing').val();
+    const ip_dist_tgt = getIpTargetDistance();
+
+    let north_south_offset = ip_dist_tgt * Math.cos((bearing * Math.PI) / 180);
+    let west_east_offset = ip_dist_tgt * Math.sin((bearing * Math.PI) / 180);
+    north_south_offset = Math.trunc(north_south_offset);
+    west_east_offset = Math.trunc(west_east_offset);
+
+    SetOffsetResult(north_south_offset, west_east_offset);
+}
+
+// Modified from original
+function saveCalculatedValues() {
+    flashSaveButton('#save_last_button');
+
+    // 1. Capture Full State
+    const state = {
+        delivery_mode: $('#delivery_mode').val(),
+        offset_method: $('#offset_method').val(),
+        bomb_type: $('#bomb_type').val(),
+        run_in_speed: $('#run_in_speed').val(),
+        run_in_alt: $('#run_in_alt').val(),
+        ip_target_dist: $('#ip_target_dist').val(),
+        dist_unit: $('#dist_unit').val(),
+        bearing: $('#bearing').val(),
+        ip_coords: $('#ip_coords').val(),
+        tgt_coords: $('#tgt_coords').val(),
+        target_alt: $('#target_alt').val(),
+        total_weight: $('#total_weight').val(),
+        release_angle: $('#release_angle').val(),
+    };
+
+    const bomb_name = $('#bomb_type_display').text();
+
+    // 2. Capture Current Calculated Display Values
+    const pull_up_timer_last = $('#pull_up_timer').text();
+    const release_range_last = $('#release_range').text();
+    const ror_slant_range_last = $('#ror_slant_range').text();
+    const time_of_flight_last = $('#time_of_flight').text();
+    const north_south_offset_last = $('#north_south').text();
+    const northing_southing_last = $('#northing_southing').text();
+    const east_west_offset_last = $('#east_west').text();
+    const easting_westing_last = $('#easting_westing').text();
+    const drag_coefficient_last = $('#drag_coefficient').text();
+    const target_range_last = $('#target_range').text();
+
+    let infoText = '';
+    
+    if (state.delivery_mode === 'Direct') {
+        const sight_depression_last = $('#sight_depression_direct').text();
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ ${sight_depression_last}mils`;
+    } else if (state.delivery_mode === 'DT') {
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ c<sub>d</sub>: ${drag_coefficient_last}`;
+    } else if (state.delivery_mode === 'TGT-Find') {
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ c<sub>d</sub>: ${drag_coefficient_last}, RoR: ${ror_slant_range_last}ft, ToF: ${time_of_flight_last}s`;
+    } else if (state.delivery_mode === 'DL') {
+        const sight_depression_last = $('#sight_depression_laydown').text();
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS):<br>&nbsp;&nbsp;↳ RR: ${release_range_last}ft, ${sight_depression_last}mils`;
+    } else if (state.delivery_mode === 'L') {
+        const sight_depression_last = $('#sight_depression_laydown').text();
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS):<br>&nbsp;&nbsp;↳ TR: ${target_range_last}, RR: ${release_range_last}ft, ${sight_depression_last}mils`;
+    } else if (state.delivery_mode === 'Loft' || state.delivery_mode === 'O-S' || state.delivery_mode === 'O-S-INST') {
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ Pull-up: ${pull_up_timer_last}s, RR: ${release_range_last}ft`;
+    } else if (state.delivery_mode === 'Offset') {
+        infoText = `${state.delivery_mode}, ${bomb_name} (${state.run_in_alt}ft MSL, ${state.run_in_speed}kts TAS):<br>&nbsp;&nbsp;↳ RR: ${release_range_last}ft, ${north_south_offset_last}ft ${northing_southing_last}, ${east_west_offset_last}ft ${easting_westing_last}`;
+    }
+    
+    // Create HTML with data-state attribute and buttons
+    // We use JSON.stringify and encodeURIComponent to safely store the state in the attribute
+    const stateString = encodeURIComponent(JSON.stringify(state));
+    
+    const itemHtml = `
+        <li class="saved-item-row" data-state="${stateString}">
+            <div class="saved-info">${infoText}</div>
+            <div class="saved-actions">
+                <button class="load-btn">LOAD</button>
+                <button class="delete-btn">X</button>
+            </div>
+        </li>`;
+    
+    if(infoText) addItemToSaved("BOMBS", itemHtml);
+}
+
+function transferPatternToJester() {
+    const release_advance = $('#release_advance').val();
+    hb_send_proxy('JESTER_PATTERN', release_advance);
+}
+
+// END OF HEATBLUR DEFINED FUNCTIONS
 // --- TRANSVERSE MERCATOR PROJECTION ENGINE ---
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -104,316 +479,6 @@ const MAP_DEFINITIONS = [
         lon0: 45.0, k0: 0.9996, x0: 0, y0: 0 
     },
 ]
-
-window.SetWeight = function SetWeight(updated_weight_lbs) { 
-    const val = updated_weight_lbs.toFixed(0);
-    $('#total_weight').val(val); 
-    $('#perf_gross_weight').val(val);
-    computePerf(); 
-    computeSightDepression();
-}
-
-window.UpdateWeight = function UpdateWeight() {
-    hb_send_proxy('UPDATE_WEIGHT');
-}
-
-window.SetLabsResult = function SetLabsResult(pull_up_timer_s) {
-    $('#pull_up_timer').text(pull_up_timer_s);
-}
-
-window.SetLabsRange = function SetLabsRange(pullup_range_ft) {
-    $('#pullup_range').text(pullup_range_ft);
-}
-
-window.SetCcrpResult = function SetCcrpResult(release_range_ft) {
-    $('#release_range').text(release_range_ft);
-}
-
-window.SetDtResult = function SetDtResult(drag_coefficient) {
-    $('#drag_coefficient').text(drag_coefficient);
-}
-
-window.SetTof = function SetTof(tof) {
-    let formattedTof = parseFloat(tof).toFixed(2);
-    if(isNaN(tof) || tof < 0) {
-        formattedTof = '⚠️';
-    }
-
-    $('#time_of_flight').text(formattedTof);
-}
-
-window.SetBombRange = function SetBombRange(bombing_range) {
-    $('#bomb_range').text(bombing_range);
-}
-
-window.SetOffsetResult = function SetOffsetResult(north_south_offset, east_west_offset) {
-    if (north_south_offset < 0) {
-        $('#northing_southing').text('S');
-        $('#north_south').text(-north_south_offset);
-    } else {
-        $('#northing_southing').text('N');
-        $('#north_south').text(north_south_offset);
-    }
-    if (east_west_offset < 0) {
-        $('#easting_westing').text('W');
-        $('#east_west').text(-east_west_offset);
-    } else {
-        $('#easting_westing').text('E');
-        $('#east_west').text(east_west_offset);
-    }
-}
-
-window.SetDirectResult = function SetDirectResult(sight_depression_direct) {
-    const additional_weight_mils = ComputeWeightMilCorrection();
-    const sight_depression_nato_mils = parseFloat(sight_depression_direct) * -FACTOR_DEGREE_TO_NATO_MILS + additional_weight_mils; //Negative because the degree we get from cpp is negative so we flip flop it around here
-    let sight_depression_text = sight_depression_nato_mils.toFixed(0);
-
-    if (sight_depression_nato_mils < 0
-        || sight_depression_nato_mils > MAXIMUM_MILS_SUPPORTED_BY_F4
-        || isNaN(sight_depression_nato_mils)
-    ) {
-        sight_depression_text = '⚠️';
-    }
-    $('#sight_depression_direct').text(sight_depression_text);
-}
-
-window.ComputeWeightMilCorrection = function ComputeWeightMilCorrection() {
-	 //weight correction is +.7 per every 1k weight above 34.2 klbs
-    const aircraft_weight = $('#total_weight').val();
-    let additional_weight_mils = (aircraft_weight - WEIGHT_CORRECTION_THRESHOLD) / 1000 * 0.7;
-
-
-    if(isNaN(additional_weight_mils)) {
-        return 0;
-    }
-    return additional_weight_mils;
-}
-
-function computeMode() {
-    const selectedMode = $('#delivery_mode').val();
-    const bomb_type = $('#bomb_type option:selected').val();
-    const run_in_altitude_ft = $('#run_in_alt').val();
-    const ip_target_distance_ft = getIpTargetDistance();
-    const run_in_speed_kt = $('#run_in_speed').val();
-    const target_altitude_ft = $('#target_alt').val();
-    const release_angle_deg = $('#release_angle').val();
-    const inverted_release_angle_deg = (-(parseFloat(release_angle_deg) || 0)).toString();
-
-    // Requires DCS specific code, logic is moved to C++ and results come back via SetXXXResult methods
-    if (selectedMode === 'Direct') {
-        hb_send_proxy('DIRECT',
-            bomb_type,
-            run_in_altitude_ft,
-            run_in_speed_kt,
-            ip_target_distance_ft,
-            target_altitude_ft,
-            inverted_release_angle_deg);
-    } else if (selectedMode === 'DL' || selectedMode === 'L' || selectedMode === 'Offset') {
-        hb_send_proxy('CCRP',
-            bomb_type,
-            run_in_altitude_ft,
-            run_in_speed_kt,
-            ip_target_distance_ft,
-            target_altitude_ft,
-            release_angle_deg);
-    } else if (selectedMode === 'Loft' || selectedMode === 'O-S' || selectedMode === 'O-S-INST') {
-        hb_send_proxy('LABS',
-            bomb_type,
-            run_in_altitude_ft,
-            run_in_speed_kt,
-            ip_target_distance_ft,
-            target_altitude_ft,
-            release_angle_deg);
-    } else if (selectedMode === 'DT' || selectedMode === 'TGT-Find') {
-        hb_send_proxy('DT',
-            bomb_type,
-            run_in_altitude_ft,
-            run_in_speed_kt,
-            ip_target_distance_ft,
-            target_altitude_ft,
-            release_angle_deg);
-    } else if (selectedMode === 'TGT-Find') {
-        hb_send_proxy('DT',
-            bomb_type,
-            run_in_altitude_ft,
-            run_in_speed_kt,
-            ip_target_distance_ft,
-            target_altitude_ft,
-            release_angle_deg);
-    }
-}
-
-function transferTableToJester() {
-    const delivery_mode = $('#delivery_mode').val();
-    const target_alt = $('#target_alt').val();
-    const dist_ip_tgt_ft = getIpTargetDistance();
-    const release_range = $('#release_range').val();
-    let drag_coefficient = $('#drag_coefficient').val();
-    let pullup_timer = $('#pull_up_timer').val();
-    const release_angle = $('#release_angle').val();
-    let north_south_offset = $('#north_south').val();
-    let east_west_offset = $('#east_west').val();
-    const northing_southing = $('#northing_southing').val();
-    const easting_westing = $('#easting_westing').val();
-
-    if (northing_southing === 'S') {
-        north_south_offset = '-' + north_south_offset;
-    }
-    if (easting_westing === 'W') {
-        east_west_offset = '-' + east_west_offset;
-    }
-
-    if (drag_coefficient === '⚠️') {
-        drag_coefficient = '1.00';
-    } else if (pullup_timer === '⚠️') {
-        pullup_timer = '0.00';
-    }
-
-    if (delivery_mode == 'L' || delivery_mode == 'DL') {
-        hb_send_proxy('JESTER_TABLE',
-            delivery_mode,
-            drag_coefficient,
-            release_range,
-            dist_ip_tgt_ft,
-            pullup_timer,
-            release_angle);
-    } else if (delivery_mode === 'Offset') {
-        hb_send_proxy('JESTER_TABLE',
-            delivery_mode,
-            drag_coefficient,
-            release_range,
-            target_alt,
-            north_south_offset,
-            east_west_offset);
-    } else if (delivery_mode === 'WRCS-AGM-45') {
-        hb_send_proxy('WRCS_AGM', target_alt);
-    } else {
-        hb_send_proxy('JESTER_TABLE',
-            delivery_mode,
-            drag_coefficient,
-            release_range,
-            target_alt,
-            pullup_timer,
-            release_angle);
-    }
-}
-
-function closeWindow() {
-    hb_send_proxy('close'); 
-}
-
-function closeAndTellJester() {
-    transferTableToJester();
-    closeWindow();
-}
-
-function getIpTargetDistance() {
-    const target_dist_unit = $('#dist_unit option:selected').val();
-    let ip_target_distance_ft = $('#ip_target_dist').val();
-
-    if (target_dist_unit === 'nm') {
-        ip_target_distance_ft *= FACTOR_NM_TO_FEET;
-        ip_target_distance_ft = Math.trunc(ip_target_distance_ft);
-    }
-    return ip_target_distance_ft;
-}
-
-function computeSightDepression() {
-    // arctan(height/range) converted to nato mils = sight depression
-    // + weight correction
-    const target_range = getIpTargetDistance();
-    const run_in_height = $('#run_in_alt').val();
-    const tgt_alt = $('#target_alt').val();
-    const additional_weight_mils = ComputeWeightMilCorrection();
-
-    let height = run_in_height - tgt_alt;
-    const sight_depression_mils = ((Math.atan(height / target_range) * 180) / Math.PI) * FACTOR_DEGREE_TO_NATO_MILS + additional_weight_mils;
-    let sight_depression_text = sight_depression_mils.toFixed(0);
-
-    if (sight_depression_mils > MAXIMUM_MILS_SUPPORTED_BY_F4 || isNaN(sight_depression_mils)) {
-        sight_depression_text = '⚠️';
-    }
-    $('#sight_depression_laydown').text(sight_depression_text);
-}
-
-function computeRorSlantRange() {
-    // ROR slant range  = sqrt(release range^2 + altitude^2)
-
-    const release_range = $('#bomb_range').val();
-    const release_altitude = $('#run_in_alt').val();
-    const target_alt = $('#target_alt').val();
-
-    let height = release_altitude - target_alt;
-
-    const ror_slant_range = Math.sqrt(Math.pow(release_range, 2) + Math.pow(height, 2))
-    let ror_slant_range_text = ror_slant_range.toFixed(0);
-
-    if (isNaN(ror_slant_range)) {
-        ror_slant_range_text = '⚠️';
-    }
-    $('#ror_slant_range').text(ror_slant_range_text);
-}
-
-function unitConverter() {
-    const target_dist_unit = $('#dist_unit option:selected').val();
-
-    const dist_input_field = $('#ip_target_dist');
-    let dist = dist_input_field.val();
-
-    if (target_dist_unit === 'nm') {
-        dist /= FACTOR_NM_TO_FEET;
-        dist = dist.toFixed(2);
-        dist_input_field.attr('step', 0.10);
-    } else {
-        dist *= FACTOR_NM_TO_FEET;
-        dist = dist.toFixed(0);
-        dist_input_field.attr('step', 100);
-    }
-
-    dist_input_field.val(dist);
-}
-
-function targetLengthConverter() {
-    const unit = $('#calc_tgt_len_unit option:selected').val();
-    const inputField = $('#calc_tgt_len');
-    let dist = inputField.val();
-
-    if (unit === 'nm') {
-        dist /= FACTOR_NM_TO_FEET;
-        dist = dist.toFixed(2);
-        inputField.attr('step', 0.01);
-    } else {
-        dist *= FACTOR_NM_TO_FEET;
-        dist = dist.toFixed(0);
-        inputField.attr('step', 10);
-    }
-}
-
-function computePattern() {
-    // interval * (bomb - 1)
-    let interval_ms = $('#release_interval').val() * 1_000;
-    const multiplier = $('#interval_multiplier option:selected').val();
-
-    if (multiplier === 'x10') {
-        interval_ms *= 10;
-    }
-    const bomb_number = $('#bomb_nr_on_target').val();
-    const release_advance_ms = interval_ms * (bomb_number - 1);
-    let release_advance_text = release_advance_ms;
-    if (release_advance_ms >= 1000) {
-        release_advance_text = '⚠️';
-    }
-    $('#release_advance').text(release_advance_text);
-}
-
-function computeOffset() {
-    const bearing = $('#bearing').val();
-    const ip_dist_tgt = getIpTargetDistance();
-
-    let north_south_offset = ip_dist_tgt * Math.cos(bearing * D2R);
-    let west_east_offset = ip_dist_tgt * Math.sin(bearing * D2R);
-    SetOffsetResult(Math.trunc(north_south_offset), Math.trunc(west_east_offset));
-}
 
 function parseDCSString(coordStr) {
     if (!coordStr) return null;
@@ -536,71 +601,6 @@ function addItemToSaved(category, itemHtml) {
     list.append(itemHtml);
 }
 
-function saveCalculatedValues() {
-    flashSaveButton('#save_last_button');
-
-    // 1. Capture Full State
-    const state = {
-        delivery_mode: $('#delivery_mode').val(),
-        offset_method: $('#offset_method').val(),
-        bomb_type: $('#bomb_type').val(),
-        run_in_speed: $('#run_in_speed').val(),
-        run_in_alt: $('#run_in_alt').val(),
-        ip_target_dist: $('#ip_target_dist').val(),
-        dist_unit: $('#dist_unit').val(),
-        bearing: $('#bearing').val(),
-        ip_coords: $('#ip_coords').val(),
-        tgt_coords: $('#tgt_coords').val(),
-        target_alt: $('#target_alt').val(),
-        total_weight: $('#total_weight').val(),
-        release_angle: $('#release_angle').val()
-    };
-
-    // 2. Capture Current Calculated Display Values
-    const pull_up_timer_last = $('#pull_up_timer').text();
-    const release_range_last = $('#release_range').text();
-    const ror_slant_range_last = $('#ror_slant_range').text();
-    const time_of_flight_last = $('#time_of_flight').text();
-    const north_south_offset_last = $('#north_south').text();
-    const northing_southing_last = $('#northing_southing').text();
-    const east_west_offset_last = $('#east_west').text();
-    const easting_westing_last = $('#easting_westing').text();
-    const drag_coefficient_last = $('#drag_coefficient').text();
-
-    let infoText = '';
-    
-    if (state.delivery_mode === 'Direct') {
-        const sight_depression_last = $('#sight_depression_direct').text();
-        infoText = `${state.delivery_mode}, ${state.bomb_type} (Rel: ${state.run_in_alt}ft, TAS: ${state.run_in_speed}kts, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ ${sight_depression_last}mils`;
-    } else if (state.delivery_mode === 'DT') {
-        infoText = `${state.delivery_mode}, ${state.bomb_type} (Rel: ${state.run_in_alt}ft, TAS: ${state.run_in_speed}kts, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ c<sub>d</sub>: ${drag_coefficient_last}`;
-    } else if (state.delivery_mode === 'TGT-Find') {
-        infoText = `${state.delivery_mode}, ${state.bomb_type} (Rel: ${state.run_in_alt}ft, TAS: ${state.run_in_speed}kts, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ c<sub>d</sub>: ${drag_coefficient_last}, ROR: ${ror_slant_range_last}ft, ToF: ${time_of_flight_last}s`;
-    } else if (state.delivery_mode === 'DL' || state.delivery_mode === 'L') {
-        const sight_depression_last = $('#sight_depression_laydown').text();
-        infoText = `${state.delivery_mode}, ${state.bomb_type} (Rel: ${state.run_in_alt}ft, TAS: ${state.run_in_speed}kts):<br>&nbsp;&nbsp;↳ Release Range: ${release_range_last}ft, ${sight_depression_last}mils`;
-    } else if (state.delivery_mode === 'Loft' || state.delivery_mode === 'O-S' || state.delivery_mode === 'O-S-INST') {
-        infoText = `${state.delivery_mode}, ${state.bomb_type} (Rel: ${state.run_in_alt}ft, TAS: ${state.run_in_speed}kts, ${state.release_angle}°):<br>&nbsp;&nbsp;↳ Pull-up: ${pull_up_timer_last}s, Release Range: ${release_range_last}ft`;
-    } else if (state.delivery_mode === 'Offset') {
-        infoText = `${state.delivery_mode}, ${state.bomb_type} (Rel: ${state.run_in_alt}ft, TAS: ${state.run_in_speed}kts):<br>&nbsp;&nbsp;↳ Release Range: ${release_range_last}ft, ${north_south_offset_last}ft ${northing_southing_last}, ${east_west_offset_last}ft ${easting_westing_last}`;
-    }
-    
-    // Create HTML with data-state attribute and buttons
-    // We use JSON.stringify and encodeURIComponent to safely store the state in the attribute
-    const stateString = encodeURIComponent(JSON.stringify(state));
-    
-    const itemHtml = `
-        <li class="saved-item-row" data-state="${stateString}">
-            <div class="saved-info">${infoText}</div>
-            <div class="saved-actions">
-                <button class="load-btn">LOAD</button>
-                <button class="delete-btn">X</button>
-            </div>
-        </li>`;
-    
-    if(infoText) addItemToSaved("BOMBS", itemHtml);
-}
-
 function loadSavedState(stateStr) {
     try {
         const state = JSON.parse(decodeURIComponent(stateStr));
@@ -608,14 +608,27 @@ function loadSavedState(stateStr) {
         // Set values
         $('#delivery_mode').val(state.delivery_mode).trigger('change');
         $('#offset_method').val(state.offset_method).trigger('change');
-        $('#bomb_type').val(state.bomb_type).trigger('change');
+        $('#bomb_type').val(state.bomb_type);
+
+        const $targetOption = $(`.option[data-value="${state.bomb_type}"]`);
+        
+        if ($targetOption.length) {
+            const text = $targetOption.text();
+            const $display = $('#bomb_type_display');
+
+            $display.text(text);
+            setTimeout(autoScaleBombText, 0);
+            
+            $('.option').removeClass('selected');
+            $targetOption.addClass('selected');
+        }
+        
+        // Finally, trigger change so math calculates
+        $('#bomb_type').trigger('change');
         $('#run_in_speed').val(state.run_in_speed);
         $('#run_in_alt').val(state.run_in_alt);
         $('#dist_unit').val(state.dist_unit).trigger('change');
-        
-        // Wait a tick for unit change to propagate if needed, though synchronous calls usually fine
         $('#ip_target_dist').val(state.ip_target_dist);
-        
         $('#bearing').val(state.bearing);
         $('#ip_coords').val(state.ip_coords);
         $('#tgt_coords').val(state.tgt_coords);
@@ -635,6 +648,8 @@ function loadSavedState(stateStr) {
             computeOffset();
         }
         computeRorSlantRange();
+        updateReleaseTypeLabel();
+        updateTargetRange();
 
     } catch (e) {
         console.error("Failed to load saved state", e);
@@ -644,7 +659,7 @@ function loadSavedState(stateStr) {
 function saveRadarValues() {
     flashSaveButton('#radar_save_btn');
     
-    const delta = parseFloat($('#radar_delta_alt').val()) || 0;
+    const delta = $('#radar_delta_alt').val();
     const range = $('#radar_tgt_range').val();
     const elev = $('#radar_elev_angle').text();
     
@@ -665,20 +680,28 @@ function saveRadarValues() {
 function savePerfValues() {
     flashSaveButton('#perf_save_btn');
     
+    const ab = ($('#perf_afterburner').prop('checked'))
     const f = $('#perf_fuel_qty').val();
-    const flow = $('#perf_fuel_flow').val();
+    let flow = $('#perf_fuel_flow').val();
+    const fuel_flow_type = $('#perf_fuel_flow_type').data('mode')      
     const tas = $('#perf_tas').val();
     const weight = $('#perf_gross_weight').val();
-    
     const time = $('#perf_curr_endurance').text();
     const range = $('#perf_curr_range').text();
+
+    if (fuel_flow_type === 'per_engine') {
+        flow *= 2;
+    }
     
-    const state = { f, flow, tas, weight };
+    const state = { ab, f, flow, tas, weight, fuel_flow_type };
     const stateString = encodeURIComponent(JSON.stringify(state));
+    
+    let ab_text = ""
+    if (ab) { ab_text = ", AB" }
 
     const itemHtml = `
         <li class="saved-item-row" data-perf-state="${stateString}">
-            <div class="saved-info">Fuel: ${f}lbs, FF ${flow}lbs/hr, TAS: ${tas}kts<br>&nbsp;&nbsp;↳ Time: ${time}, Range: ${range}nm</div>
+            <div class="saved-info">${f}lbs Fuel, ${flow}lbs/hr, ${tas}kts TAS${ab_text}<br>&nbsp;&nbsp;↳ Time: ${time}, Range: ${range}nm</div>
             <div class="saved-actions">
                 <button class="load-btn perf-load">LOAD</button>
                 <button class="delete-btn">X</button>
@@ -696,7 +719,7 @@ function clearRadarValues() {
 function clearPerfValues() {
     $('#perf_gross_weight').val('45142');
     $('#perf_fuel_qty').val('12000');
-    $('#perf_fuel_flow').val('5000');
+    $('#perf_fuel_flow').val('14000');
     $('#perf_tas').val('450');
     computePerf();
 }
@@ -704,12 +727,6 @@ function clearPerfValues() {
 function clearSavedValues() {
     $('#saved_container').empty();
 }
-
-function transferPatternToJester() {
-    const release_advance = $('#release_advance').val();
-    hb_send_proxy('JESTER_PATTERN', release_advance);
-}
-
 
 function computeRequiredInterval() {
     let lengthNm = parseFloat($('#calc_tgt_len').val()) || 0;
@@ -746,8 +763,11 @@ function computeRequiredInterval() {
 
     const distPerBomb = lengthFt / (bombCount - 1);
     const intervalSec = distPerBomb / speedFps;
-
-    $('#calc_req_interval').text(intervalSec.toFixed(2));
+    if (intervalSec < 0.05) {
+        $('#calc_req_interval').text("< 0.05");
+    } else {
+        $('#calc_req_interval').text(intervalSec.toFixed(2));
+    }
 }
 
 function applyCalculatedInterval() {
@@ -817,6 +837,24 @@ function getCasFromMach(mach, alt) {
     return tas * Math.sqrt(sigma);
 } */
 
+function targetLengthConverter() {
+    const unit = $('#calc_tgt_len_unit option:selected').val();
+    const input_field = $('#calc_tgt_len');
+    let dist = input_field.val();
+
+    if (unit === 'nm') {
+        dist /= FACTOR_NM_TO_FEET;
+        dist = dist.toFixed(2);
+        input_field.attr('step', 0.01);
+    } else {
+        dist *= FACTOR_NM_TO_FEET;
+        dist = dist.toFixed(0);
+        input_field.attr('step', 10);
+    }
+
+    input_field.val(dist)
+}
+
 function computeRadarElevation() {
     const deltaAlt = parseFloat($('#radar_delta_alt').val()) || 0;
     const rangeNm = parseFloat($('#radar_tgt_range').val()) || 5;
@@ -835,17 +873,58 @@ function computeRadarElevation() {
     }
 }
 
-function computePerf() {
-    const fuel = parseFloat($('#perf_fuel_qty').val()) || 0;
-    const flow = parseFloat($('#perf_fuel_flow').val()) || 1; 
-    const gs = parseFloat($('#perf_tas').val()) || 0;
-    const weight = parseFloat($('#perf_gross_weight').val()) || 30000;
+function fuelFlowConverter() {
+    const fuel_flow_type = $('#perf_fuel_flow_type')
+    const target_fuel_flow_type = fuel_flow_type.data('mode')
+    const fuel_flow_input_field = $('#perf_fuel_flow');
+    let multiplier = 2
 
-    const enduranceHours = fuel / flow;
+    if (target_fuel_flow_type === 'combined') {
+        fuel_flow_type.data('mode', 'per_engine');
+        fuel_flow_type.text('Fuel Flow per Eng.');
+        multiplier = 0.5
+    } else {
+        fuel_flow_type.data('mode', 'combined');
+        fuel_flow_type.text('Combined Fuel Flow');
+    }
+
+    const attributes = ['min', 'max', 'step'];
+    attributes.forEach(attr => {
+        const currentVal = fuel_flow_input_field.attr(attr);
+        fuel_flow_input_field.attr(attr, currentVal * multiplier);
+    });
+
+    let currentFlow = fuel_flow_input_field.val();
+    fuel_flow_input_field.val(currentFlow * multiplier);
+
+    fuel_flow_type.css('transition', 'background-color 0.2s').css('background-color', 'rgba(88, 151, 251, 0.3)');
+    setTimeout(() => fuel_flow_type.css('background-color', ''), 300);
+
+    computePerf();
+}
+
+function computePerf() {
+    const fuel = $('#perf_fuel_qty').val();
+    let flow = $('#perf_fuel_flow').val(); 
+    const gs = $('#perf_tas').val();
+    const weight = $('#perf_gross_weight').val();
+    const target_fuel_flow_type = $('#perf_fuel_flow_type').data('mode');
+
+    if (target_fuel_flow_type === 'per_engine') {
+        flow *= 2;
+    } 
+
+    let enduranceHours = fuel / flow;
+    let range = enduranceHours * gs;
+
+    if ($('#perf_afterburner').prop('checked')) {
+        enduranceHours /= 4;
+        range /= 4;
+    }
+
     const hours = Math.floor(enduranceHours);
     const minutes = Math.floor((enduranceHours - hours) * 60);
     const timeStr = String(hours) + 'hr' + String(minutes).padStart(2, '0');
-    const range = enduranceHours * gs;
     
     $('#perf_curr_endurance').text(timeStr);
     $('#perf_curr_range').text(range.toFixed(0));
@@ -862,6 +941,46 @@ function toggleCollapse(e) {
     const content = header.next('.collapsible-content');
     header.toggleClass('collapsed');
     content.slideToggle(200);
+}
+
+// --- Shrink Text to Fit ---
+    function autoScaleBombText() {
+        const $text = $('#bomb_type_display');
+        
+        let currentSize = 1.0;
+        $text.css('font-size', '1em');
+
+        while ($text[0].scrollWidth > $text[0].clientWidth && currentSize > 0.6) {
+            currentSize -= 0.05;
+            $text.css('font-size', currentSize + 'em');
+        }
+    }
+
+function updateReleaseTypeLabel() {
+    const angle = $('#release_angle').val()
+    const label = $('#release_type')
+    
+    if (angle > 0) {
+        label.text('loft')
+    } else if (angle < 0) {
+        label.text('dive')
+    } else {
+        label.text('level')
+    }
+}
+
+function updateTargetRange() {
+    let dist = $('#ip_target_dist').val()
+    const target_dist_unit = $('#dist_unit option:selected').val();
+
+    const output_field = $('#target_range');
+
+    if (target_dist_unit === 'nm') {
+        dist *= FACTOR_NM_TO_FEET;
+        dist = dist.toFixed(0);;
+    }
+
+    output_field.val(dist);
 }
 
 $(document).ready(function () {
@@ -901,13 +1020,41 @@ $(document).ready(function () {
 
     // Close on 'B' key press
     $(document).on('keydown', function(event) {
-        if ((event.key === 'b' || event.key === 'B') && !$(event.target).is('input, select, textarea')) {
+        if ((event.key === 'b' || event.key === 'B' || event.code === 'KeyB') && !$(event.target).is('input, select, textarea')) {
             closeWindow();
         }
     });
 
-    $('#delivery_mode, #offset_method').change(updateUI);
-    updateUI();
+    // Toggle the main dropdown when clicking the trigger
+    $('.custom-select-trigger').on('click', function(e) {
+        // Close other dropdowns if you had multiple
+        $('.custom-select-wrapper').not($(this).parent()).removeClass('open');
+        // Toggle this one
+        $(this).parent().toggleClass('open');
+        e.stopPropagation();
+    });
+
+    // Handle Option Selection
+    $('.option').on('click', function() {
+        const value = $(this).data('value');
+        const text = $(this).text();
+        const $wrapper = $(this).closest('.custom-select-wrapper');
+        const $display = $wrapper.find('#bomb_type_display');
+        
+        $display.text(text);
+        autoScaleBombText();
+        $wrapper.removeClass('open'); // Close menu
+        
+        $('#bomb_type').val(value).trigger('change');
+        $wrapper.removeClass('open');
+        $('.option').removeClass('selected');
+        $(this).addClass('selected');
+    });
+
+    // Close dropdown when clicking anywhere else on page
+    $(document).on('click', function() {
+        $('.custom-select-wrapper').removeClass('open');
+    });    
 
     // Event Listeners
     $('#erase_button').click(() => { computeSightDepression(); computeMode(); });
@@ -916,14 +1063,17 @@ $(document).ready(function () {
     $('#transfer_pattern_to_jester').click(transferPatternToJester);
     $('#closeWindow').click(closeWindow);
     $('#transfer_to_jester_and_close').click(closeAndTellJester);
-    $('#update_weight').click(window.UpdateWeight);
-    $('#update_weight_perf').click(window.UpdateWeight);
+    $('#update_weight').click(function () { UpdateWeight() });
+    $('#update_weight_perf').click(function () { UpdateWeight() });
 
+    $('#delivery_mode, #offset_method').change(updateUI);
     $('#bomb_type, #run_in_alt, #run_in_speed, #ip_target_dist, #target_alt, #release_angle, #total_weight, #delivery_mode').on('input change', function() {
         computeMode();
         computeSightDepression();
     });
+    $('#release_angle').on('input change', updateReleaseTypeLabel);
 
+    $('#ip_target_dist').on('input change', updateTargetRange);
     $('#bearing, #ip_target_dist').change(computeOffset);
     $('#release_interval, #interval_multiplier, #bomb_nr_on_target').change(computePattern);
     $('#run_in_speed, #bomb_range, #run_in_alt, #target_alt').change(computeRorSlantRange);
@@ -932,7 +1082,8 @@ $(document).ready(function () {
     $('.coord-change').change(cleanCoordInput);
     
     $('#radar_delta_alt, #radar_tgt_range').on('input change', computeRadarElevation);
-    $('#perf_fuel_qty, #perf_fuel_flow, #perf_tas, #perf_gross_weight').on('input change', computePerf);
+    $('#perf_gross_weight, #perf_fuel_qty, #perf_afterburner, #perf_fuel_flow, #perf_tas').on('input change', computePerf);
+    $('#perf_fuel_flow_type').click(fuelFlowConverter);
 
     $('#calc_tgt_len, #calc_release_qty, #run_in_speed, #release_angle, #delivery_mode').on('input change', computeRequiredInterval);
     $('#calc_tgt_len_unit').change(function() {
@@ -981,17 +1132,41 @@ $(document).ready(function () {
         else if (li.data('perf-state')) {
             try {
                 const state = JSON.parse(decodeURIComponent(li.data('perf-state')));
+                
+                $('#perf_afterburner').prop('checked', state.ab);
                 $('#perf_fuel_qty').val(state.f);
-                $('#perf_fuel_flow').val(state.flow);
                 $('#perf_tas').val(state.tas);
+
+                const savedMode = state.fuel_flow_type; 
+                const $label = $('#perf_fuel_flow_type');
+                const $input = $('#perf_fuel_flow');
+
+                if (savedMode === 'per_engine') {
+                    $label.data('mode', 'per_engine');
+                    $label.text('Fuel Flow per Eng.');
+                    $input.attr({ min: 1000, max: 12000, step: 500 });
+                } else {
+                    $label.data('mode', 'combined');
+                    $label.text('Combined Fuel Flow');
+                    $input.attr({ min: 2000, max: 24000, step: 1000 });
+                }
+
+                let flowToDisplay = state.flow;
+                
+                if (savedMode === 'per_engine') {
+                    flowToDisplay = flowToDisplay / 2;
+                }
+                
+                $input.val(flowToDisplay);
                 $('#perf_gross_weight').val(state.weight).trigger('change');
                 $('.tab-btn[data-target="tab-perf"]').click();
             } catch(e) {}
-        }
+        } 
     });
 
     $('.collapsible-header').click(toggleCollapse);
     
+    updateUI();
     computeRadarElevation();
     computePerf();
     computeRequiredInterval();

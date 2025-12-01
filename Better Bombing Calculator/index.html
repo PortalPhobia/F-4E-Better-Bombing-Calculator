@@ -56,6 +56,83 @@
                         </td>
                     </tr>
 
+                    <!-- Custom Weapon Selector -->
+                    <tr>
+                        <td>
+                            <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                                <div class="label-with-dots"><label for="bomb_type">Type of bomb</label></div>
+                            </section>
+                        </td>
+                        <td>
+                            <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
+                                <div class="custom-select-wrapper">
+                                    <div class="custom-select-trigger">
+                                        <span id="bomb_type_display">MK-82</span>
+                                        <span class="arrow">▼</span>
+                                    </div>
+                                    <input type="hidden" id="bomb_type" value="MK-82" />
+                                    <div class="custom-options">
+                                
+                                        <div class="custom-category">
+                                            <span class="category-title">General Purpose <span>◀</span></span>
+                                            <div class="category-options">
+                                                <div class="option" data-value="MK-81">Mk-81</div>
+                                                <div class="option" data-value="MK-82">Mk-82</div>
+                                                <div class="option" data-value="MK-83">Mk-83</div>
+                                                <div class="option" data-value="MK-84">Mk-84</div>
+                                                <div class="option" data-value="M117">M117</div>
+                                                <div class="option" data-value="SAMP-250">SAMP-250</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-category">
+                                            <span class="category-title">High Drag <span>◀</span></span>
+                                            <div class="category-options">
+                                                <div class="option" data-value="MK-82AIR">Mk-82 AIR</div>
+                                                <div class="option" data-value="MK-82AIR-LD">Mk-82 AIR LD</div>
+                                                <div class="option" data-value="MK-82SNAKEYE">Mk-82 SNK</div>
+                                                <div class="option" data-value="MK-82SNAKEYE-LD">Mk-82 SNK LD</div>
+                                                <div class="option" data-value="MK-84AIR">Mk-84 AIR</div>
+                                                <div class="option" data-value="SAMP-250-HD">SAMP-250 HD</div>
+                                                <div class="option" data-value="BLU-107">BLU-107</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-category">
+                                            <span class="category-title">Cluster <span>◀</span></span>
+                                            <div class="category-options">
+                                                <div class="option" data-value="CBU-52B">CBU-52B</div>
+                                                <div class="option" data-value="CBU-87">CBU-87</div>
+                                                <div class="option" data-value="ROCKEYE">Mk-20</div>
+                                                <div class="option" data-value="BL-755">BL-755</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-category">
+                                            <span class="category-title">Guided <span>◀</span></span>
+                                            <div class="category-options">
+                                                <div class="option" data-value="GBU-10">GBU-10</div>
+                                                <div class="option" data-value="GBU-12">GBU-12</div>
+                                                <div class="option" data-value="GBU-24">GBU-24</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-category">
+                                            <span class="category-title">Training <span>◀</span></span>
+                                            <div class="category-options">
+                                                <div class="option" data-value="BDU-33">BDU-33</div>
+                                                <div class="option" data-value="BDU-45">BDU-45 LG</div>
+                                                <div class="option" data-value="BDU-50LD">BDU-50 LD</div>
+                                                <div class="option" data-value="BDU-50HD">BDU-50 HD</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </section>
+                        </td>
+                    </tr>
+
                     <!-- Offset Method Selector -->
                     <tr>
                         <td>
@@ -73,38 +150,7 @@
                         </td>
                         <td></td>
                     </tr>
-
-                    <tr>
-                        <td>
-                            <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
-                                <div class="label-with-dots"><label for="bomb_type">Type of bomb</label></div>
-                            </section>
-                        </td>
-                        <td>
-                            <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
-                                <select id="bomb_type">
-                                    <option value="none" disabled hidden>Type</option>
-                                    <option value="MK-81">MK-81</option>
-                                    <option value="MK-82" selected>MK-82</option>
-                                    <option value="MK-83">MK-83</option>
-                                    <option value="MK-84">MK-84</option>
-                                    <option value="MK-82AIR">MK-82AIR</option>
-                                    <option value="MK-82AIR-LD">MK-82AIR LD</option>
-                                    <option value="MK-82SNAKEYE">MK-82SNK</option>
-                                    <option value="MK-82SNAKEYE-LD">MK-82SNK LD</option>
-                                    <option value="M117">M117</option>
-                                    <option value="CBU-87">CBU-87</option>
-                                    <option value="ROCKEYE">MK-20</option>
-                                    <option value="GBU-10">GBU-10</option>
-                                    <option value="GBU-12">GBU-12</option>
-                                    <option value="GBU-24">GBU-24</option>
-                                    <option value="BDU-33">BDU-33</option>
-                                    <option value="BDU-50LD">BDU-50LD</option>
-                                    <option value="BDU-50HD">BDU-50HD</option>
-                                </select>
-                            </section>
-                        </td>
-                    </tr>
+                    
                     <tr>
                         <td>
                             <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
@@ -118,7 +164,7 @@
                         </td>
                         <td>
                             <section class="jqueryOptions Direct DT DL L Offset Loft O-S O-S-INST TGT-Find">
-                                knots TAS
+                                kts TAS
                             </section>
                         </td>
                     </tr>
@@ -168,7 +214,7 @@
                                 <label for="dist_unit" class="hidden" hidden>Distance Unit</label>
                                 <select id="dist_unit">
                                     <option value="nm">nm</option>
-                                    <option value="feet">feet</option>
+                                    <option value="ft">ft</option>
                                 </select>
                             </section>
                         </td>
@@ -193,7 +239,7 @@
                     <tr class="lat-long-row" style="display:none;">
                         <td>
                             <section class="jqueryOptions Offset lat-long-group">
-                                <div class="label-with-dots"><label for="ip_coords">IP Coords</label></div>
+                                <div class="label-with-dots"><label for="ip_coords">IP Coordinates</label></div>
                             </section>
                         </td>
                         <td>
@@ -207,7 +253,7 @@
                     <tr class="lat-long-row" style="display:none;">
                         <td>
                             <section class="jqueryOptions Offset lat-long-group">
-                                <div class="label-with-dots"><label for="tgt_coords">TGT Coords</label></div>
+                                <div class="label-with-dots"><label for="tgt_coords">TGT Coordinates</label></div>
                             </section>
                         </td>
                         <td>
@@ -218,7 +264,6 @@
                         </td>
                         <td></td>
                     </tr>
-                    <!-- END NEW -->
 
                     <tr>
                         <td>
@@ -256,7 +301,7 @@
                             </section>
                         </td>
                         <td>
-                            <section class="jqueryOptions DT Direct TGT-Find Loft O-S O-S-INST">deg</section>
+                            <section class="jqueryOptions DT Direct TGT-Find Loft O-S O-S-INST" id="release_type">° level</section>
                         </td>
                     </tr>
                     
@@ -298,6 +343,26 @@
                         </td>
                         <td>
                             <section class="jqueryOptions Loft O-S O-S-INST">feet</section>
+                        </td>
+                    </tr>
+                                        <tr>
+                        <td>
+                            <section class="jqueryOptions L">
+                                <div class="label-with-dots"><label>Target Range</label></div>
+                            </section>
+                        </td>
+                        <td>
+                            <section class="jqueryOptions L">
+                                <output
+                                    class="output-container"
+                                    id="target_range"
+                                    for="run_in_alt run_in_speed target_alt ip_target_dist"
+                                    >0</output
+                                >
+                            </section>
+                        </td>
+                        <td>
+                            <section class="jqueryOptions L">feet</section>
                         </td>
                     </tr>
                     <tr>
@@ -359,7 +424,7 @@
                     <tr>
                         <td>
                             <section class="jqueryOptions Direct DL L">
-                                <div class="label-with-dots"><label>Sight depression</label></div>
+                                <div class="label-with-dots"><label>Sight Depression</label></div>
                             </section>
                         </td>
                         <td>
@@ -401,7 +466,7 @@
                     <tr>
                         <td>
                             <section class="jqueryOptions Direct DT TGT-Find">
-                                <div class="label-with-dots"><label>Bomb range</label></div>
+                                <div class="label-with-dots"><label>Bomb Range</label></div>
                             </section>
                         </td>
                         <td>
@@ -440,7 +505,7 @@
                             </section>
                         </td>
                         <td>
-                            <section class="jqueryOptions TGT-Find">ft</section>
+                            <section class="jqueryOptions TGT-Find">feet</section>
                         </td>
                     </tr>
                     <tr>
@@ -491,8 +556,8 @@
                                 <input type="number" id="calc_tgt_len" min="0" max="500000" step="0.01" value="0" />
                             </td>
                             <td>
-                                <!-- UPDATED: Unit Select -->
-                                <select id="calc_tgt_len_unit" style="width: 100%; min-width: 40px;">
+                                <!-- Unit Select -->
+                                <select id="calc_tgt_len_unit">
                                     <option value="nm">nm</option>
                                     <option value="ft">ft</option>
                                 </select>
@@ -506,7 +571,7 @@
                                 <output class="output-container" id="calc_req_interval">0.00</output>
                             </td>
                             <td style="vertical-align: bottom;">
-                                <button id="apply_interval_btn" style="font-size: 0.7em; height: 28px; cursor: pointer;">SET ▼</button>
+                                <button id="apply_interval_btn">SET ▼</button>
                             </td>
                         </tr>
                     </table>
@@ -519,7 +584,7 @@
                             <td>
                                 <div class="label-with-dots"><label for="release_interval">Release Interval</label></div>
                             </td>
-                            <td><input type="number" id="release_interval" min="0.01" max="1.0" step="0.01" value="0.05" /></td>
+                            <td><input type="number" id="release_interval" min="0.05" max="1.0" step="0.01" value="0.05" /></td>
                             <td>sec</td>
                         </tr>
                         <tr>
@@ -596,7 +661,6 @@
 
             <!-- TAB: PERF -->
             <div id="tab-perf" class="tab-content" style="display: none;">
-                <h1>Aircraft Status</h1>
                 <table>
                     <tr>
                         <td><div class="label-with-dots"><label for="perf_gross_weight">Aircraft Weight</label></div></td>
@@ -612,8 +676,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><div class="label-with-dots"><label for="perf_fuel_qty">Total Fuel</label></div></td>
-                        <td><input type="number" id="perf_fuel_qty" min="0" max="20000" step="100" value="12000" /></td>
+                        <td><div class="label-with-dots"><label for="perf_fuel_qty">Fuel on Board</label></div></td>
+                        <td><input type="number" id="perf_fuel_qty" min="0" max="20000" step="500" value="12000" /></td>
                         <td>lbs</td>
                     </tr>
                 </table>
@@ -621,8 +685,18 @@
                 <h1>Current Performance</h1>
                 <table>
                     <tr>
-                        <td><div class="label-with-dots"><label for="perf_fuel_flow">Fuel Flow</label></div></td>
-                        <td><input type="number" id="perf_fuel_flow" min="1000" max="60000" step="100" value="6000" /></td>
+                        <td><div class="label-with-dots"><label for="perf_afterburner">Afterburners</label></div></td>
+                        <td><input type="checkbox" id="perf_afterburner" /></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="label-with-dots">
+                                <label for="perf_fuel_flow" id="perf_fuel_flow_type" class="interactive-label" data-mode="combined">
+                                    Combined Fuel Flow
+                                </label>
+                            </div>
+                        </td>
+                        <td><input type="number" id="perf_fuel_flow" min="2000" max="24000" step="1000" value="14000" /></td>
                         <td>pph</td>
                     </tr>
                     <tr>
@@ -631,11 +705,11 @@
                         <td>kts</td>
                     </tr>
                     <tr class="output_begin">
-                        <td><div class="label-with-dots"><label>Curr. Endurance</label></div></td>
+                        <td><div class="label-with-dots"><label>Estimated Endurance</label></div></td>
                         <td><output class="output-container" id="perf_curr_endurance">00:00</output></td>
                     </tr>
                     <tr>
-                        <td><div class="label-with-dots"><label>Curr. Range</label></div></td>
+                        <td><div class="label-with-dots"><label>Estimated Range</label></div></td>
                         <td><output class="output-container" id="perf_curr_range">0</output></td>
                         <td>nm</td>
                     </tr>
@@ -649,7 +723,7 @@
                     </tr>
                 </table>
 
-                <h1>Optimal Profiles (Estimated)</h1>
+                <h1>Optimal Profiles</h1>
                 <table style="text-align: center; width: 100%; table-layout: fixed;">
                     <label>To Be Implemented</label>
                 </table>

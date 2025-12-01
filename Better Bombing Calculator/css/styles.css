@@ -1,8 +1,15 @@
+/* Import Caveat (Handwriting) */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
+
 :root {
     /* Light Theme Colors */
     --foreground-color: #080808;
     --background-color: #fafafa;
     --close-background-color: #e5e5e5;
+    
+    /* Variables */
+    --accent-color: #5897fb; 
+    --accent-text-color: #ffffff;
     --background-image: url('../img/paper_background.jpg');
 }
 
@@ -146,6 +153,48 @@ input[type='reset'] {
     color: var(--foreground-color);
 }
 
+input[type="checkbox"] {
+    appearance: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    margin: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-6px, 5px);
+}
+
+input[type="checkbox"]::before {
+    content: "[  ]"; 
+    font-family: 'Courier New', monospace; 
+    font-weight: lighter;
+    font-size: 1.5em;
+    color: var(--foreground-color);
+    top: -2px;
+
+    display: inline-block;
+    transform: scaleY(1.3);   
+    transform-origin: bottom;
+}
+
+input[type="checkbox"]::after {
+    content: "X"; 
+    font-family: "Caveat", cursive;
+    font-size: 2.5em;
+    color: #1a237e; 
+    position: absolute;
+    left: 40%;
+    top: 32%;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+input[type="checkbox"]:checked::after {
+    transform: translate(-50%, -50%) scale(1) rotate(-10deg);
+}
+
 .button-group {
     padding-top: 8px;
 }
@@ -193,8 +242,6 @@ output.output-container:before {
     line-height: 20px;
 }
 
-/* Applied some tricky CSS here to force these dots to wrap, but with overflow
- * hidden and the flex shrink, you'll never see half dots cropped out */
 .label-with-dots:after {
     content: ' . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .';
     direction: rtl;
@@ -212,7 +259,7 @@ tr.output_begin > td {
     padding-top: 1em;
 }
 
-/* Select2 Overrides */
+/* --- Select2 Overrides --- */
 select,
 .select2,
 .select2-selection {
@@ -255,20 +302,20 @@ select,
     background-color: var(--background-color);
 }
 
+/* UPDATED: Selected Option is now Blue (Accent) */
 .select2-container--default .select2-results__option--selected {
-    background-color: var(--foreground-color);
-    color: var(--background-color);
-    /* opacity: 0.5; Removed opacity for active state to 'swap' */
+    background-color: var(--accent-color);
+    color: var(--accent-text-color);
 }
 
 .select2-results__options {
     text-align: right;
 }
 
+/* Hover Highlight remains Default (Black/Foreground) */
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
     background-color: var(--foreground-color);
     color: var(--background-color);
-    opacity: 0.5; /* Added opacity here to swap */
 }
 
 .select2-container .select2-selection--single .select2-selection__rendered {
@@ -298,30 +345,43 @@ input::-webkit-inner-spin-button {
     font-size: 1.5vh !important;
 }
 
-/* Utility class to hide elements dynamically via JS logic */
 .force-hide {
     display: none !important;
 }
 
-/* Specific style for the long coordinate inputs */
 .coord-input {
-    width: 200px !important; /* Match standard input width to prevent cutoff */
-    font-size: 1.5vh !important; /* Slightly smaller font to fit long coords */
+    width: 200px !important; 
+    font-size: 1.5vh !important; 
     padding-left: 5px;
     padding-right: 5px;
 }
 
-/* Flex container for inputs with buttons */
 .flex-row {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Styles for the "X" clear button */
+/* Clear Button (Lat/Long X) - Matched to SAVED page style */
+.clear-btn {
+    border: 1px solid var(--foreground-color);
+    background: transparent;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.8em;
+    padding: 0px 4px;
+    margin-left: 5px;
+    line-height: 1.4;
+    transition: all 0.2s;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
 .clear-btn:hover {
-    background-color: #6d6d6d;
+    background-color: #ff4d4d;
     color: white;
+    border-color: #ff4d4d;
 }
 
 /* --- TAB NAVIGATION STYLES --- */
@@ -359,7 +419,6 @@ input::-webkit-inner-spin-button {
     border-bottom: 3px solid #5897fb;
 }
 
-/* Ensure content is hidden by default if not active (handled by JS, but good practice) */
 .tab-content {
     width: 100%;
 }
@@ -384,6 +443,17 @@ input::-webkit-inner-spin-button {
     margin-left: 10px;
 }
 
+#apply_interval_btn {
+    height: 30px;
+    width: 50px;
+    color: var(--foreground-color);
+    background-color: var(--background-color);
+    border: 2px dashed var(--foreground-color);
+    font-size: 0.8em;
+    padding: 3px 0px 0px 0px;
+    cursor: pointer;
+}
+
 .saved-section {
     margin-bottom: 25px;
 }
@@ -398,8 +468,8 @@ input::-webkit-inner-spin-button {
     margin-left: 10px;
     background-color: var(--background-color);
     position: relative;
-    top: 2px; /* Pull down to overlap border */
-    z-index: 2; /* Sit on top of the content border */
+    top: 2px; 
+    z-index: 2; 
 }
 
 .file-folder-content {
@@ -433,7 +503,7 @@ input::-webkit-inner-spin-button {
     display: flex;
     gap: 2px;
     flex-shrink: 0;
-    align-items: flex-start; /* Align with top line of text */
+    align-items: flex-start; 
 }
 
 .load-btn, .delete-btn {
@@ -467,8 +537,151 @@ input::-webkit-inner-spin-button {
     line-height: 1.1;
     color: var(--foreground-color);
     opacity: 0.9;
-    pointer-events: none; /* Allows clicking through if needed */
+    pointer-events: none; 
     z-index: 10;
     text-align: left;
     font-weight: normal;
+}
+
+.interactive-label {
+    cursor: pointer;
+    border-bottom: 1px dotted var(--foreground-color); 
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.interactive-label:hover {
+    border-bottom: 1px solid #5897fb; 
+    color: #5897fb;
+}
+
+.interactive-label::after {
+    content: ' ⇄'; 
+    font-size: 0.8em;
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-left: 3px;
+}
+
+.interactive-label:hover::after {
+    opacity: 1;
+}
+
+/* --- Custom Categories Dropdown --- */
+
+.custom-select-wrapper {
+    position: relative;
+    user-select: none;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.custom-select-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 30px;
+    padding: 10px 0 4px 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1em;
+    letter-spacing: 2px;
+    color: var(--foreground-color);
+    background-color: transparent;
+    border: 2px solid var(--foreground-color);
+    cursor: pointer;
+
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.custom-select-trigger span:first-child {
+    margin-left: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    /* text-overflow: ellipsis; */
+    max-width: 100%;
+    text-align: right; 
+}
+
+.custom-select-trigger .arrow {
+    font-size: 0.5em;
+    margin-left: 5px;
+    margin-right: 4px;
+    transform: translateY(-2px) scaleX(1.6);
+}
+
+.custom-options {
+    position: absolute;
+    display: none;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--background-color);
+    border: 2px solid var(--foreground-color);
+    z-index: 100;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.custom-select-wrapper.open .custom-options {
+    display: block;
+}
+
+.custom-category {
+    position: relative;
+    border-bottom: 1px dashed #ccc;
+}
+
+.category-title {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    cursor: default;
+    font-size: 1em; 
+    font-weight: bold;
+    color: var(--foreground-color);
+}
+
+.category-title:hover {
+    background-color: var(--foreground-color);
+    color: var(--background-color);
+}
+
+/* Fly-out Menu (Right) */
+.category-options {
+    display: none;
+    position: absolute;
+    right: 100%;
+    top: -2px;
+    width: max-content; 
+    background-color: var(--background-color);
+    border: 2px solid var(--foreground-color);
+    z-index: 101;
+    margin-left: 2px;
+}
+
+.custom-category:hover .category-options {
+    display: block;
+}
+
+/* Option Items */
+.option {
+    padding: 6px 10px;
+    cursor: pointer;
+    text-align: left;
+    
+    transition: background 0.2s;
+    font-size: 1em;
+    white-space: nowrap;
+}
+
+.option:hover {
+    background-color: var(--foreground-color);
+    color: var(--background-color);
+}
+
+.option.selected {
+    background-color: var(--accent-color);
+    color: var(--accent-text-color);
 }
