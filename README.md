@@ -4,23 +4,28 @@ A comprehensive overhaul of the default in-game Bombing Calculator overlay for t
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/main_page.jpg">
-        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/main_page.jpg" width="200px;">
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/radar_page.jpg">
-        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/radar_page.jpg" width="200px;">
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/perf_page.jpg">
-        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/perf_page.jpg" width="200px;">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/main_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/main_page.jpg" width="200px;">
       </a>
     </td>
 	<td align="center">
-      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/saved_page.jpg">
-        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/486712a8feb1438ed6113639cedcaa9e954bc44d/Images/saved_page.jpg" width="200px;">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/bomb_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/bomb_page.jpg" width="200px;">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/radar_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/radar_page.jpg" width="200px;">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/perf_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/perf_page.jpg" width="200px;">
+      </a>
+    </td>
+	<td align="center">
+      <a href="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/saved_page.jpg">
+        <img src="https://github.com/PortalPhobia/F-4E-Better-Bombing-Calculator/blob/main/Images/saved_page.jpg" width="200px;">
       </a>
     </td>
   </tr>
@@ -82,5 +87,19 @@ Thank you to JonathanTurnock for his DCS World Projections list:
 - https://github.com/JonathanTurnock/dcs-projections
 
 # Changelog
+## v1.1a [2025/12/01]
+- Fixed aircraft weight synchronization
+- Added Target Range output to Laydown mode
+- Target range is now saved to the SAVED page
+- For invalid Drag Coefficients, Jester will now input 9.99 rather than 1.00
+
+## v1.1 [2025/11/28]
+- Updated for DCS 2.9.22.17790
+- Improved the Bomb selection menu to better accommodate the larger number of bombs.
+- Interval calculator now shows a warning when a value below the minimum interval of 0.05 is calculated.
+- Modified some labels and fixed some minor text capitalization issues for better consistency and clarity.
+- Changed multiple quantity limits and quantity step sizes to more realistic sizes.
+- Added fuel flow type selector to PERF page. Can be toggled between combined and per engine fuel flow.
+- Added afterburner checkbox to PERF page for more accurate predictions with afterburners on.
 ## v1.0B [2025/11/23]
 - Added the ability to press "B" to close the overlay without having to click off the overlay, as long as an input field is not selected
